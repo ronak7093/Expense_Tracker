@@ -1,22 +1,23 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
-import { Categories } from "./categorise.schema";
+import { CategoryType } from "src/enum/categeory.enum";
+import { User } from "./user.schema";
 
 @Schema({ timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" } })
 
 export class Expense {
 
-    @Prop()
-    title: string;
+    @Prop({ required: true, enum: CategoryType })
+    title: CategoryType;
 
-    @Prop()
+    @Prop({ required: true })
     amount: number;
 
-    @Prop()
+    @Prop({ required: true })
     date: Date;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Categories' })
-    categoriesId: Categories
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+    userId: User;
 }
 
-export const expenseSchema = SchemaFactory.createForClass(Expense);
+export const ExpenseSchema = SchemaFactory.createForClass(Expense);

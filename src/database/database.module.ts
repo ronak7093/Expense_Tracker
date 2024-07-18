@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+require("dotenv").config({ path: ".env" });
 
 @Module({
     imports: [
