@@ -103,7 +103,8 @@ export class ExpenseService {
                     date: {
                         $gte: new Date(new Date(fromDateFormatted).setHours(0, 0, 0, 0)),
                         $lte: new Date(new Date(toDateFormatted).setHours(23, 59, 59, 999)),
-                    }
+                    },
+                    userId: _id
                 }
             },
             {
@@ -112,11 +113,48 @@ export class ExpenseService {
                 }
             },
             {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            },
+            { '$unwind': '$user' },
+            {
+                $addFields: {
+                    userName: "$user.firstName",
+                    srName: "$user.lastName",
+                    email: "$user.email"
+                }
+            },
+            {
                 $project: {
+                    _id: "$userId",
                     title: 1,
                     amount: 1,
-                    formattedDate: {
+                    ExpenseDate: {
                         $dateToString: { format: "%d-%m-%Y", date: "$date" }
+                    },
+                    // userName: 1,
+                    userName: {
+                        $concat: ["$userName", " ", "$srName"]
+                    },
+                    email: 1
+                }
+            },
+            {
+                $group: {
+                    _id: "$_id",
+                    name: { $first: "$userName" },
+                    email: { $first: "$email" },
+                    // total: { $sum: "$amount" },
+                    expense: {
+                        $push: {
+                            title: "$title",
+                            amount: "$amount",
+                            ExpenseDate: "$ExpenseDate"
+                        }
                     }
                 }
             }
