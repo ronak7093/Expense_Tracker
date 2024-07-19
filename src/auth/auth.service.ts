@@ -53,38 +53,31 @@ export class AuthService {
     }
 
     async doLoginUser(payload: LoginUserDto) {
-        try {
-            let userRecord = await this.userModel.findOne({
-                email: payload.email
-            })
-            if (!userRecord) {
-                return {
-                    code: 404,
-                    message: MESSAGE_CONSTANT.USER_NOT_FOUND,
-                }
-            }
-            //@ts-ignore
-            const isPasswordValid = await userRecord.comparePassword(payload.password);
-            if (!isPasswordValid) {
-                return {
-                    code: 401,
-                    message: MESSAGE_CONSTANT.INVALID_PASSWORD,
-                };
-            }
-
-            const token = { id: userRecord._id, email: userRecord.email }
-            let accessToken = await this.jwtService.sign(token, {
-                secret: process.env.JWT_SECRET_KEY,
-                expiresIn: "1w",
-            })
-
+        let userRecord = await this.userModel.findOne({
+            email: payload.email
+        })
+        if (!userRecord) {
             return {
-                data: accessToken,
-                message: MESSAGE_CONSTANT.USER_LOGIN_SUCCESSFULLY,
-                code: 200,
-            }
-        } catch (error) {
-            console.log(error, 'error>>>>>>>');
-        }
+                code: 404,
+                message: MESSAGE_CONSTANT.USER_NOT_FOUND,
+            };
+        };
+        //@ts-ignore
+        const isPasswordValid = await userRecord.comparePassword(payload.password);
+        if (!isPasswordValid) {
+            return {
+                code: 401,
+                message: MESSAGE_CONSTANT.INVALID_PASSWORD,
+            };
+        };
+
+        //@ts-ignore
+        let accessToken = await userRecord.generateToken();
+
+        return {
+            data: accessToken,
+            message: MESSAGE_CONSTANT.USER_LOGIN_SUCCESSFULLY,
+            code: 200,
+        };
     }
 }

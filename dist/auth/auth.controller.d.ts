@@ -42,7 +42,7 @@ export declare class AuthController {
         message: string;
         data?: undefined;
     } | {
-        data: string;
+        data: any;
         message: string;
         code: number;
     }>;

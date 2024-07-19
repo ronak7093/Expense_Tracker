@@ -12,15 +12,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserSchema = exports.User = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+require("dotenv").config({ path: ".env" });
 let User = class User {
 };
 exports.User = User;
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: true, trim: true }),
     __metadata("design:type", String)
 ], User.prototype, "firstName", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: true, trim: true }),
     __metadata("design:type", String)
 ], User.prototype, "lastName", void 0);
 __decorate([
@@ -62,5 +64,9 @@ exports.UserSchema.methods.comparePassword = async function (candidatePassword) 
         console.log(error, 'error');
         throw new Error(error);
     }
+};
+exports.UserSchema.methods.generateToken = async function () {
+    const accessToken = jwt.sign({ _id: this._id, email: this.email }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.JWT_EXPIRE });
+    return accessToken;
 };
 //# sourceMappingURL=user.schema.js.map

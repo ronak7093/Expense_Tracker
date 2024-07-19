@@ -46,7 +46,7 @@ export declare class AuthService {
         message: string;
         data?: undefined;
     } | {
-        data: string;
+        data: any;
         message: string;
         code: number;
     }>;

@@ -1,14 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
+import * as jwt from 'jsonwebtoken';
+require("dotenv").config({ path: ".env" });
 
 @Schema({ timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } })
 
 export class User {
 
-    @Prop({ required: true })
+    @Prop({ required: true, trim: true })
     firstName: string;
 
-    @Prop({ required: true })
+    @Prop({ required: true, trim: true })
     lastName: string;
 
     @Prop({ required: true, trim: true, unique: true })
@@ -50,3 +52,9 @@ UserSchema.methods.comparePassword = async function (candidatePassword) {
         throw new Error(error);
     }
 }
+
+// generate token 
+UserSchema.methods.generateToken = async function () {
+    const accessToken = jwt.sign({ _id: this._id, email: this.email }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.JWT_EXPIRE });
+    return accessToken;
+};

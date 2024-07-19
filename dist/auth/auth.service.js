@@ -55,37 +55,30 @@ let AuthService = class AuthService {
         }
     }
     async doLoginUser(payload) {
-        try {
-            let userRecord = await this.userModel.findOne({
-                email: payload.email
-            });
-            if (!userRecord) {
-                return {
-                    code: 404,
-                    message: message_1.MESSAGE_CONSTANT.USER_NOT_FOUND,
-                };
-            }
-            const isPasswordValid = await userRecord.comparePassword(payload.password);
-            if (!isPasswordValid) {
-                return {
-                    code: 401,
-                    message: message_1.MESSAGE_CONSTANT.INVALID_PASSWORD,
-                };
-            }
-            const token = { id: userRecord._id, email: userRecord.email };
-            let accessToken = await this.jwtService.sign(token, {
-                secret: process.env.JWT_SECRET_KEY,
-                expiresIn: "1w",
-            });
+        let userRecord = await this.userModel.findOne({
+            email: payload.email
+        });
+        if (!userRecord) {
             return {
-                data: accessToken,
-                message: message_1.MESSAGE_CONSTANT.USER_LOGIN_SUCCESSFULLY,
-                code: 200,
+                code: 404,
+                message: message_1.MESSAGE_CONSTANT.USER_NOT_FOUND,
             };
         }
-        catch (error) {
-            console.log(error, 'error>>>>>>>');
+        ;
+        const isPasswordValid = await userRecord.comparePassword(payload.password);
+        if (!isPasswordValid) {
+            return {
+                code: 401,
+                message: message_1.MESSAGE_CONSTANT.INVALID_PASSWORD,
+            };
         }
+        ;
+        let accessToken = await userRecord.generateToken();
+        return {
+            data: accessToken,
+            message: message_1.MESSAGE_CONSTANT.USER_LOGIN_SUCCESSFULLY,
+            code: 200,
+        };
     }
 };
 exports.AuthService = AuthService;
